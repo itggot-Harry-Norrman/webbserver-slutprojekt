@@ -54,18 +54,26 @@ class App < Sinatra::Base
 		end
 	end
 
-	# get '/user' do
-	# 	db = SQLite3::Database.new("db/fitness.db")
-	# 	if session[:user_id]
-	# 		posts = db.execute("SELECT title, content FROM posts WHERE status=public")
-	# 	slim(:user)
-	# end
+	get '/user' do
+		db = SQLite3::Database.new("db/fitness.db")
+		status = "public"
+		if session[:user_id]
+			posts = db.execute("SELECT title, content FROM posts WHERE status=?", status)
+		else
+			posts = db.execute("SELECT title, content FROM posts WHERE status=?", status)
+		end
+		slim(:user)
+	end
 
-	# get '/search' do
-	# 	db = SQLite3::Database.new("db/fitness.db")
-	# 	searched = params[:search_inp]
-	# 	search_arr = db.execute("SELECT name FROM users WHERE name LIKE(?)", searched)
-	# 	slim(:search, locals:{search_arr:search_arr})
-	# end
+	post '/search/user' do
+		redirect('/search/'+params['search_inp'])
+	end
+
+	get '/search/:search_inp' do
+		db = SQLite3::Database.new("db/fitness.db")
+		searched = params[:search_inp]
+		search_arr = db.execute("SELECT name FROM users WHERE name LIKE ?", ["%"+searched+"%"])
+		slim(:search, locals:{search_arr:search_arr})
+	end
 
 end           
