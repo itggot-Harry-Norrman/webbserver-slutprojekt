@@ -1,0 +1,20 @@
+nav 
+    h1 
+        a href= "/" MyFitness
+.search
+    form action="/search" method="GET"
+        input type="text" placeholder="Search Users" name="search_inp"
+        input type="submit" value="Search"
+
+img src="./img/add.svg" alt="" class="add"
+
+.add_post
+    form action="/add_post" method="post" class="add_post" id="add_post"
+        input type="text" name="title" placeholder="title"
+        textarea cols="30" rows="10" type="text" name="content" placeholder="write your post here" id="content" form="add_form"
+        .choice
+            input type="radio" name="status" value="private" id="priv"
+                label for="priv" private
+            input type="radio" name="status" value="public" id="publ"
+                label for="publ" public
+        input type="submit" value="Post"
