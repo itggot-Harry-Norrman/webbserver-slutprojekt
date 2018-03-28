@@ -9,3 +9,11 @@ html lang="en"
     body
         .wrapper
             ==yield
+    script src="js/jquery-3.2.1.min.js"
+    javascript:
+            $("#hide").ready(function(){
+                $(".add_post").hide();
+            });
+            $("#hide").click(function(){
+                $(".add_post").toggle(400);
+            });

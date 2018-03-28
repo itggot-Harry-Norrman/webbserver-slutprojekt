@@ -7,5 +7,11 @@ nav
             input type="text" placeholder="Username" name="username"
             input type="password" placeholder="Password" name="password"
             input type="Submit" value="Log in"
-
 h1 = msg
+article 
+    - public_posts.each do |content|
+        .post
+            .title
+                h3 = content[0]
+            .content
+                p = content[1]

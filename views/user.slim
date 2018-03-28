@@ -1,20 +1,53 @@
 nav 
     h1 
-        a href= "/" MyFitness
+        a href= "/user" MyFitness
     .search
+        form action="/logout" method="POST"
+            input type="submit" value="Logout"
         form action="/search/user" method="POST"
             input type="text" placeholder="Search Users" name="search_inp"
             input type="submit" value="Search"
+img src="./img/add.svg" alt="" id="hide" class="add"
+.main_art
+    .add_post
+        form action="/add_post" method="post" class="add_post" id="add_post" name="add_form"
+            input type="text" name="title" placeholder="title"
+            textarea cols="30" rows="10" type="text" name="text_content" placeholder="write your post here" id="content"
+            .choice
+                input type="radio" name="status" value="private" id="private"
+                    label for="private" private
+                input type="radio" name="status" value="public" id="public"
+                    label for="public" public
+            input type="submit" value="Post"
+    .scheme 
+        h1 scheme
 
-img src="./img/add.svg" alt="" class="add"
-
-.add_post
-    form action="/add_post" method="post" class="add_post" id="add_post"
-        input type="text" name="title" placeholder="title"
-        textarea cols="30" rows="10" type="text" name="content" placeholder="write your post here" id="content" form="add_form"
-        .choice
-            input type="radio" name="status" value="private" id="priv"
-                label for="priv" private
-            input type="radio" name="status" value="public" id="publ"
-                label for="publ" public
-        input type="submit" value="Post"
+    article.posts_article
+        - priv_posts.each do |content|
+            .post
+                .title
+                    h3 = content[0]
+                .content
+                    p = content[1]
+        - public_posts.each do |content|
+            .post
+                .title
+                    h3 = content[0]
+                .content
+                    p = content[1]
+    .friend_box
+        .friends
+            h1 Friends
+            -friends.each do |friend|
+                .single_box
+                    h3 =friend
+                    form action="/delete_friend" method="post"
+                        input type="submit" value="x"
+            
+        .requests 
+            h1 Friend requests
+            -friend_requests.each do |single|
+                h3 =single[0]
+                form action="/accept_friend" method="post"
+                    input type="hidden" name="adding_id" value="#{single[1]}"
+                    input type="submit" value="Add Friend"

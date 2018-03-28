@@ -39,9 +39,19 @@ a {
 .title {
     background-color: royalblue;
     text-align: center;
+    width: 35vw;
 }
-.post_content {
-    margin: 10px;
+.content {
+    background-color: brown;
+    width: 35vw;
+}
+.post {
+    width: 35vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 45px;
 }
 .scheme_box {
     background-color: royalblue;
@@ -75,12 +85,54 @@ a {
 .add {
     width: 70px;
     height: 70px;
+    position: fixed;
+    right: 0;
+    bottom: 0;
 }
 .add_post {
     display: flex;
     flex-direction: column;
     width: 35vw;
+    position: fixed;
+    top: 50vh;
+    z-index: 9999;
 }
 #content {
     height: 80px;
+}
+article {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100vw;
+}
+.main_art {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.friend_box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 20px;
+}
+.friends {
+    text-align: right;
+    width: 15vw;
+}
+.requests {
+    text-align: right;
+    width: 15vw;
+}
+.single_box {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    width: 15vw;
+}
+.scheme {
+    margin-left: 20px;
+    width: 15vw;
 }

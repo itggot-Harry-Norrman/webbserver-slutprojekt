@@ -1,9 +1,15 @@
-nav
-        h1 
-                a href= "/" MyFitness
-        .search
+link rel="stylesheet" href="../css/style.css"/
+nav 
+    h1 
+        a href= "/user" MyFitness
+    .search
         form action="/search/user" method="POST"
-                input type="text" placeholder="Search Users" name="search_inp"
-                input type="submit" value="Search"
+            input type="text" placeholder="Search Users" name="search_inp"
+            input type="submit" value="Search"
 
-- 
+- search_arr.each do |users|
+        h3 #{users[0]}  #{users[1]} 
+        form action="/friend_request" method="POST"
+                input type="hidden" value="#{users[0]}" name="username"
+                input type="hidden" value="#{users[1]}" name="user_id"
+                input type="submit" value="Friend request"
