@@ -41,7 +41,8 @@ img src="./img/add.svg" alt="" id="hide" class="add"
             -friends.each do |friend|
                 .single_box
                     h3 =friend
-                    form action="/delete_friend" method="post"
+                    form action="/remove_friend" method="post"
+                        input type="hidden" name="remove" value="#{friend}"
                         input type="submit" value="x"
             
         .requests 

@@ -69,7 +69,7 @@ class App < Sinatra::Base
 			priv_posts = db.execute("SELECT title, content, user_id FROM posts WHERE status='private'")
 			priv_arr = []
 			priv_posts.each do |priv_post|
-				if db.execute("SELECT status FROM relations WHERE adding_id=? AND added_id=? ", [session[:user_id], priv_post[2]])[0] == [1] or db.execute("SELECT status FROM relations WHERE adding_id=? AND added_id=? ", [priv_post[2], session[:user_id]])[0] == [1]
+				if db.execute("SELECT status FROM relations WHERE adding_id=? AND added_id=?", [session[:user_id], priv_post[2]])[0] == [1] or db.execute("SELECT status FROM relations WHERE adding_id=? AND added_id=? ", [priv_post[2], session[:user_id]])[0] == [1] or priv_post[2] == session[:user_id]
 					priv_arr << priv_post
 				end
 			end
@@ -105,12 +105,17 @@ class App < Sinatra::Base
 
 	post '/add_post' do
 		db = SQLite3::Database.new("db/fitness.db")
-		title = params[:title]
-		content = params[:text_content]
-		status = params[:status]
-		id = session[:user_id]
-		db.execute("INSERT INTO posts('title', 'content', 'status', 'user_id') VALUES (?,?,?,?)", [title, content, status, id])
-		redirect("/user")
+		if session[:user_id]
+			title = params[:title]
+			content = params[:text_content]
+			status = params[:status]
+			id = session[:user_id]
+			db.execute("INSERT INTO posts('title', 'content', 'status', 'user_id') VALUES (?,?,?,?)", [title, content, status, id])
+			redirect("/user")
+		else
+			session[:msg] = stand
+			redirect("/")
+		end
 	end
 	get '/search/' do
 		redirect("/user")
@@ -139,6 +144,7 @@ class App < Sinatra::Base
 			db.execute("UPDATE relations SET status=1 WHERE adding_id=? AND added_id=?", [adding_id, session[:user_id]])
 			redirect("/user")
 		else
+			session[:msg] = stand
 			redirect("/")
 		end
 	end
@@ -146,5 +152,19 @@ class App < Sinatra::Base
 		session[:user_id] = nil
 		session[:msg] = nil
 		redirect("/")
+	end
+	post '/remove_friend' do
+		db = SQLite3::Database.new("db/fitness.db")
+		delete_user = params[:remove]
+		if session[:user_id]
+				p db.execute("SELECT * FROM relations WHERE adding_id=(SELECT id FROM users WHERE name=?) AND added_id=?",[delete_user, session[:user_id]])
+				p db.execute("SELECT * FROM relations WHERE added_id=(SELECT id FROM users WHERE name=?) AND adding_id=?",[delete_user, session[:user_id]])
+				db.execute("DELETE FROM relations WHERE adding_id=(SELECT id FROM users WHERE name=?) AND added_id=?",[delete_user, session[:user_id]])
+				db.execute("DELETE FROM relations WHERE added_id=(SELECT id FROM users WHERE name=?) AND adding_id=?",[delete_user, session[:user_id]])
+				redirect("/user")
+		else
+			session[:msg] = stand
+			redirect("/")
+		end
 	end
 end           
