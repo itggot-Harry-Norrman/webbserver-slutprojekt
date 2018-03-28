@@ -1,6 +1,8 @@
 nav 
     h1 
-        a href= "/user" MyFitness
+        a href="/user" MyFitness
+    h3
+        a href="/user/info" = user_info[0][0]
     .search
         form action="/logout" method="POST"
             input type="submit" value="Logout"
@@ -52,3 +54,6 @@ img src="./img/add.svg" alt="" id="hide" class="add"
                 form action="/accept_friend" method="post"
                     input type="hidden" name="adding_id" value="#{single[1]}"
                     input type="submit" value="Add Friend"
+                form action="/remove_friend" method="post"
+                    input type="hidden" name="remove" value="#{single[0]}"
+                    input type="submit" value="x"

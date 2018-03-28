@@ -73,6 +73,7 @@ class App < Sinatra::Base
 					priv_arr << priv_post
 				end
 			end
+			user_info = db.execute("SELECT name, id FROM users WHERE id=?", session[:user_id])
 			friends1 = db.execute("SELECT name FROM users WHERE id=(SELECT adding_id FROM relations WHERE status='1' AND added_id=?)", session[:user_id])
 			friends2 = db.execute("SELECT name FROM users WHERE id=(SELECT added_id FROM relations WHERE status='1' AND adding_id=?)", session[:user_id])
 			friends = []
@@ -80,7 +81,7 @@ class App < Sinatra::Base
 			friends = friends.flatten
 			priv_arr = priv_arr.reverse
 			posts = posts.reverse
-			slim(:user, locals:{friend_requests:friend_requests, public_posts:posts, priv_posts:priv_arr, friends:friends})
+			slim(:user, locals:{friend_requests:friend_requests, public_posts:posts, priv_posts:priv_arr, friends:friends, user_info:user_info})
 		else
 			session[:msg] = stand
 			redirect("/")
@@ -157,13 +158,21 @@ class App < Sinatra::Base
 		db = SQLite3::Database.new("db/fitness.db")
 		delete_user = params[:remove]
 		if session[:user_id]
-				p db.execute("SELECT * FROM relations WHERE adding_id=(SELECT id FROM users WHERE name=?) AND added_id=?",[delete_user, session[:user_id]])
-				p db.execute("SELECT * FROM relations WHERE added_id=(SELECT id FROM users WHERE name=?) AND adding_id=?",[delete_user, session[:user_id]])
 				db.execute("DELETE FROM relations WHERE adding_id=(SELECT id FROM users WHERE name=?) AND added_id=?",[delete_user, session[:user_id]])
 				db.execute("DELETE FROM relations WHERE added_id=(SELECT id FROM users WHERE name=?) AND adding_id=?",[delete_user, session[:user_id]])
 				redirect("/user")
 		else
 			session[:msg] = stand
+			redirect("/")
+		end
+	end
+	get '/user/info' do
+		db = SQLite3::Database.new("db/fitness.db")
+		if session[:user_id]
+			user_info = db.execute("SELECT id, name, img_index FROM users WHERE id=?", session[:user_id])
+			scheme = db.execute("SELECT id, excercise, reps, sets, day FROM scheme WHERE user_id=?", session[:user_id])
+			slim(:info, locals:{user_info:user_info, scheme:scheme})
+		else
 			redirect("/")
 		end
 	end

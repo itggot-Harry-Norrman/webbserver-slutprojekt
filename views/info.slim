@@ -1,0 +1,60 @@
+link rel="stylesheet" href="../css/style.css"/
+nav 
+    h1 
+        a href="/user" MyFitness
+    h3
+        a href="/user/info" = user_info[0][1]
+    .search
+        form action="/logout" method="POST"
+            input type="submit" value="Logout"
+        form action="/search/user" method="POST"
+            input type="text" placeholder="Search Users" name="search_inp"
+            input type="submit" value="Search"
+img src="./img/add.svg" alt="" id="hide" class="add"
+.main_art
+    .add_post
+        form action="/excercise_add" method="post" class="add_post" id="excercise_add" name="add_form"
+            input type="text" name="excercise" placeholder="Excercise" 
+            h3 sets
+            input type="number" name="sets" min="0" max="100" step="1" value="3"
+            h3 reps
+            input type="number" name="reps" min="0" max="100" step="1" value="8"
+            select name="day"
+                option value="mon" Monday
+                option value="tue" Tuesday
+                option value="wed" Wednesday
+                option value="thu" Thursday
+                option value="fri" Friday
+                option value="sat" Saturday
+                option value="sun" Sunday
+            input type="submit" value="Post"
+.scheme_all
+    -scheme.each do |excercise|
+            - if excercise[4] == "mon"
+                .day
+                    h1 = excercise[1]
+                    / p =excercise[1].to_s + excercise[2].to_s + "x" excercise[3].to_s
+            - elsif excercise[4] == "tue"
+                .day
+                    = excercise[1]
+                    / p =excercise[1].to_s + excercise[2].to_s + "x" excercise[3].to_s
+            - elsif excercise[4] == "wed"
+                .day
+                    = excercise[1]
+                    / p =excercise[1].to_s + excercise[2].to_s + "x" excercise[3].to_s
+            - elsif excercise[4] == "thu"
+                .day
+                    = excercise[1]
+                    / p =excercise[1].to_s + excercise[2].to_s + "x" excercise[3].to_s
+            - elsif excercise[4] == "fri"
+                .day
+                    = excercise[1]
+                    / p =excercise[1].to_s + excercise[2].to_s + "x" excercise[3].to_s
+            - elsif excercise[4] == "sat"
+                .day
+                    = excercise[1]
+                    / p =excercise[1].to_s + excercise[2].to_s + "x" excercise[3].to_s
+            - elsif excercise[4] == "sun"
+                .day
+                    = excercise[1]
+                    / p =excercise[1].to_s + excercise[2].to_s + "x" excercise[3].to_s
