@@ -5,9 +5,10 @@ class App < Sinatra::Base
 
 	get '/' do
 		db = SQLite3::Database.new("db/fitness.db")
-		public_posts = db.execute("SELECT title, content FROM posts WHERE status=?","public")
+		public_posts = db.execute("SELECT title, content, id FROM posts WHERE status=?","public")
+		comments = db.execute("SELECT content, post_id, user_id, user_name FROM comments WHERE post_id=(SELECT id FROM posts WHERE status='public')")
 		public_posts = public_posts.reverse
-		slim(:index, locals:{msg: session[:msg], public_posts:public_posts})
+		slim(:index, locals:{msg: session[:msg], public_posts:public_posts, comments:comments})
 	end
 	get '/register_site' do
 		slim(:register)
@@ -64,9 +65,9 @@ class App < Sinatra::Base
 		db = SQLite3::Database.new("db/fitness.db")
 		status = "public"
 		if session[:user_id]
-			posts = db.execute("SELECT title, content FROM posts WHERE status='public'")
+			posts = db.execute("SELECT title, content, user_id, id FROM posts WHERE status='public'")
 			friend_requests = db.execute("SELECT name, id FROM users WHERE id=(SELECT adding_id FROM relations WHERE added_id=? AND status=0)", session[:user_id])
-			priv_posts = db.execute("SELECT title, content, user_id FROM posts WHERE status='private'")
+			priv_posts = db.execute("SELECT title, content, user_id, id FROM posts WHERE status='private'")
 			priv_arr = []
 			priv_posts.each do |priv_post|
 				if db.execute("SELECT status FROM relations WHERE adding_id=? AND added_id=?", [session[:user_id], priv_post[2]])[0] == [1] or db.execute("SELECT status FROM relations WHERE adding_id=? AND added_id=? ", [priv_post[2], session[:user_id]])[0] == [1] or priv_post[2] == session[:user_id]
@@ -79,9 +80,10 @@ class App < Sinatra::Base
 			friends = []
 			friends << friends1 << friends2
 			friends = friends.flatten
+			comments = db.execute("SELECT content, post_id, user_id, user_name FROM comments")
 			priv_arr = priv_arr.reverse
 			posts = posts.reverse
-			slim(:user, locals:{friend_requests:friend_requests, public_posts:posts, priv_posts:priv_arr, friends:friends, user_info:user_info})
+			slim(:user, locals:{friend_requests:friend_requests, public_posts:posts, priv_posts:priv_arr, friends:friends, user_info:user_info, comments:comments})
 		else
 			session[:msg] = stand
 			redirect("/")
@@ -176,4 +178,35 @@ class App < Sinatra::Base
 			redirect("/")
 		end
 	end
+	post '/comment_private' do
+		db = SQLite3::Database.new("db/fitness.db")
+		if session[:user_id]
+			#fixa injections via privata comments
+			p db.execute("SELECT status FROM relations WHERE added_id=(SELECT user_id FROM comments WHERE post_id=?) AND adding_id=?", [params[:post_id], session[:user_id]]).flatten
+			p db.execute("SELECT status FROM relations WHERE added_id=(SELECT user_id FROM comments WHERE post_id=?) AND adding_id=?", [session[:user_id], params[:post_id]]).flatten
+			if db.execute("SELECT status FROM relations WHERE added_id=(SELECT user_id FROM comments WHERE id=?) AND adding_id=?", [params[:post_id], session[:user_id]]).flatten == [1] or db.execute("SELECT status FROM relations WHERE added_id=(SELECT user_id FROM comments WHERE id=?) AND adding_id=?", [session[:user_id], params[:post_id]]).flatten == [1] or db.execute("SELECT user_id FROM comments WHERE post_id=?", params[:post_id]) == session[:user_id]
+			name = db.execute("SELECT name FROM users WHERE id=?", session[:user_id])
+			db.execute("INSERT INTO comments(content, post_id, user_id, user_name) VALUES(?,?,?,?)", [params[:comment], params[:post_id], session[:user_id], name])
+			redirect('/user')
+			else
+				session[:msg] == "Unauthorized action detected"
+				redirect("/")
+			end
+		else
+			session[:msg] = stand
+			redirect('/')
+		end
+	end
+	post '/comment_public' do
+		db = SQLite3::Database.new("db/fitness.db")
+		if session[:user_id]
+			name = db.execute("SELECT name FROM users WHERE id=?", session[:user_id])
+			db.execute("INSERT INTO comments(content, post_id, user_id, user_name) VALUES(?,?,?,?)", [params[:comment], params[:post_id], session[:user_id], name])
+			redirect('/user')
+		else
+			session[:msg] = stand
+			redirect('/')
+		end
+	end
+
 end           

@@ -15,3 +15,12 @@ article
                 h3 = content[0]
             .content
                 p = content[1]
+            .show_comment
+                p class="plus" +
+                .comments.hide_this
+                    .comment_s
+                        -comments.each do |comment_single|
+                            - if comment_single[1] == content[2]
+                                .comment
+                                    p #{comment_single[0]+ "-" + comment_single[3]}
+                                    

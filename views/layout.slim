@@ -17,3 +17,7 @@ html lang="en"
             $("#hide").click(function(){
                 $(".add_post").toggle(400);
             });
+            $('.plus').click(function(){
+                $(this).siblings(this).toggleClass("hide_this")
+                $(this).toggleClass("rotate_this")
+            });

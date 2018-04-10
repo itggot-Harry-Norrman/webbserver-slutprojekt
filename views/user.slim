@@ -31,12 +31,39 @@ img src="./img/add.svg" alt="" id="hide" class="add"
                     h3 = content[0]
                 .content
                     p = content[1]
+                .show_comment
+                    p class="plus" +
+                    .comments.hide_this
+                        -comments.each do |comment_single|
+                            - if comment_single[1] == content[3]
+                                .comment
+                                    p #{comment_single[0]+ "-" + comment_single[3]}
+                        form action="/comment_private" method="post" class="comment_form"
+                            input type="text" name="comment" class="inp_txt"
+                            input type="hidden" name="post_id" value="#{content[3]}"
+                            input type="hidden" name="name" value="#{user_info[0][0]}"
+                            input type="submit" value="comment" class="inp_sbm"
         - public_posts.each do |content|
             .post
                 .title
                     h3 = content[0]
                 .content
                     p = content[1]
+                .likes 
+                    form action="/like_post" method="post"
+                        input type="submit" value="Dumbbell"
+                        input type="hidden" name=""
+                .show_comment
+                    p class="plus" +
+                    .comments.hide_this
+                        -comments.each do |comment_single|
+                            - if comment_single[1] == content[3]
+                                .comment
+                                    p #{comment_single[0]+ "-" + comment_single[3]}
+                        form action="/comment_public" method="post"
+                            input type="text" name="comment"
+                            input type="hidden" name="post_id" value="#{content[3]}"
+                            input type="submit" value="comment"
     .friend_box
         .friends
             h1 Friends
@@ -50,10 +77,11 @@ img src="./img/add.svg" alt="" id="hide" class="add"
         .requests 
             h1 Friend requests
             -friend_requests.each do |single|
-                h3 =single[0]
-                form action="/accept_friend" method="post"
-                    input type="hidden" name="adding_id" value="#{single[1]}"
-                    input type="submit" value="Add Friend"
-                form action="/remove_friend" method="post"
-                    input type="hidden" name="remove" value="#{single[0]}"
-                    input type="submit" value="x"
+                .request
+                    h3 = single[0]
+                    form action="/accept_friend" method="post"
+                        input type="hidden" name="adding_id" value="#{single[1]}"
+                        input type="submit" value="Add Friend"
+                    form action="/remove_friend" method="post"
+                        input type="hidden" name="remove" value="#{single[0]}"
+                        input type="submit" value="x"
