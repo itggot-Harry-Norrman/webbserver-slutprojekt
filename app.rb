@@ -6,6 +6,7 @@ class App < Sinatra::Base
 	get '/' do
 		db = SQLite3::Database.new("db/fitness.db")
 		public_posts = db.execute("SELECT title, content, id FROM posts WHERE status=?","public")
+		p public_posts
 		comments = db.execute("SELECT content, post_id, user_id, user_name FROM comments WHERE post_id=(SELECT id FROM posts WHERE status='public')")
 		public_posts = public_posts.reverse
 		slim(:index, locals:{msg: session[:msg], public_posts:public_posts, comments:comments})
@@ -25,6 +26,8 @@ class App < Sinatra::Base
 			session[:msg] = "Passwords don't match"
 		elsif db.execute("SELECT name FROM users WHERE name=?", username) != []
 			session[:msg] = "Username already exists"
+		elsif username.size > 14
+			session[:msg] = "Username is too long maximum length of username is 14 characters"
 		else
 			db.execute("INSERT INTO users ('name', 'password') VALUES (?,?)", [username, password])
 		end
@@ -75,15 +78,29 @@ class App < Sinatra::Base
 				end
 			end
 			user_info = db.execute("SELECT name, id FROM users WHERE id=?", session[:user_id])
-			friends1 = db.execute("SELECT name FROM users WHERE id=(SELECT adding_id FROM relations WHERE status='1' AND added_id=?)", session[:user_id])
-			friends2 = db.execute("SELECT name FROM users WHERE id=(SELECT added_id FROM relations WHERE status='1' AND adding_id=?)", session[:user_id])
+			friends1 = db.execute("SELECT id,name FROM users WHERE id in (SELECT added_id FROM relations WHERE status='1' AND adding_id=?)", session[:user_id])
+			friends2 = db.execute("SELECT id,name FROM users WHERE id in (SELECT adding_id FROM relations WHERE status='1' AND added_id=?)", session[:user_id])
 			friends = []
 			friends << friends1 << friends2
 			friends = friends.flatten
+			index_friends = 0
+			friend_ids = []
+			friend_names = []
+			friends.each do |friend_inf|
+				if index_friends/2 == index_friends.to_f/2
+					friend_ids << friend_inf
+					index_friends += 1
+				else
+					friend_names << friend_inf
+					index_friends += 1
+				end
+			end
+			session[:friend_ids] = friend_ids
 			comments = db.execute("SELECT content, post_id, user_id, user_name FROM comments")
 			priv_arr = priv_arr.reverse
 			posts = posts.reverse
-			slim(:user, locals:{friend_requests:friend_requests, public_posts:posts, priv_posts:priv_arr, friends:friends, user_info:user_info, comments:comments})
+			schedule = db.execute("SELECT id, excercise, reps, sets, day FROM scheme WHERE user_id=?", session[:user_id])
+			slim(:user, locals:{friend_requests:friend_requests, public_posts:posts, priv_posts:priv_arr, friends:friend_names, user_info:user_info, comments:comments, schedule:schedule})
 		else
 			session[:msg] = stand
 			redirect("/")
@@ -171,7 +188,7 @@ class App < Sinatra::Base
 	get '/user/info' do
 		db = SQLite3::Database.new("db/fitness.db")
 		if session[:user_id]
-			user_info = db.execute("SELECT id, name, img_index FROM users WHERE id=?", session[:user_id])
+			user_info = db.execute("SELECT id, name FROM users WHERE id=?", session[:user_id])
 			scheme = db.execute("SELECT id, excercise, reps, sets, day FROM scheme WHERE user_id=?", session[:user_id])
 			slim(:info, locals:{user_info:user_info, scheme:scheme})
 		else
@@ -182,9 +199,8 @@ class App < Sinatra::Base
 		db = SQLite3::Database.new("db/fitness.db")
 		if session[:user_id]
 			#fixa injections via privata comments
-			p db.execute("SELECT status FROM relations WHERE added_id=(SELECT user_id FROM comments WHERE post_id=?) AND adding_id=?", [params[:post_id], session[:user_id]]).flatten
-			p db.execute("SELECT status FROM relations WHERE added_id=(SELECT user_id FROM comments WHERE post_id=?) AND adding_id=?", [session[:user_id], params[:post_id]]).flatten
-			if db.execute("SELECT status FROM relations WHERE added_id=(SELECT user_id FROM comments WHERE id=?) AND adding_id=?", [params[:post_id], session[:user_id]]).flatten == [1] or db.execute("SELECT status FROM relations WHERE added_id=(SELECT user_id FROM comments WHERE id=?) AND adding_id=?", [session[:user_id], params[:post_id]]).flatten == [1] or db.execute("SELECT user_id FROM comments WHERE post_id=?", params[:post_id]) == session[:user_id]
+			test_id = db.execute("SELECT id FROM users WHERE id=(SELECT user_id FROM posts WHERE id=?)", params[:post_id])[0][0]  
+			if db.execute("SELECT name FROM users WHERE id=?", session[:user_id])[0][0] == params[:name] and session[:friend_ids].include?(test_id) == true  
 			name = db.execute("SELECT name FROM users WHERE id=?", session[:user_id])
 			db.execute("INSERT INTO comments(content, post_id, user_id, user_name) VALUES(?,?,?,?)", [params[:comment], params[:post_id], session[:user_id], name])
 			redirect('/user')
@@ -208,5 +224,45 @@ class App < Sinatra::Base
 			redirect('/')
 		end
 	end
-
+	post '/excercise_add' do
+		db = SQLite3::Database.new("db/fitness.db")
+		if session[:user_id] 
+			if params[:excercise].size < 14
+			db.execute("INSERT INTO scheme(excercise, reps, sets, day, user_id) VALUES(?,?,?,?,?)", params[:excercise], params[:reps], params[:sets], params[:day], session[:user_id])
+				if params[:link]
+					redirect('/user')
+				else
+					redirect('/user/info')
+				end
+				redirect('/user')
+			else
+				session[:msg] = stand
+				redirect('/')
+			end
+		end
+	end
+	post '/delete_excercise' do
+		db = SQLite3::Database.new("db/fitness.db")
+		if session[:user_id]
+			db.execute("DELETE FROM scheme WHERE id=? AND user_id=?", [params[:excercise_id], session[:user_id]])
+			redirect('/user')
+		else
+			session[:msg] = stand
+			redirect('/')
+		end
+	end
+	post '/add_stat' do
+			db = SQLite3::Database.new("db/fitness.db")
+			if session[:user_id]
+				packed_date = Time.now
+				packed_date = packed_date.to_s.split(" ")
+				date = packed_date[0][5..9]
+				weight = params[:weight].to_s + "kg"
+				db.execute("INSERT INTO statistics(date, lift, weight, user_id) VALUES(?,?,?,?)", [date, params[:lift].capitalize, weight, session[:user_id]])
+				redirect('/user/info')
+			else
+				session[:msg] = stand
+				redirect('/')
+		end
+	end
 end           

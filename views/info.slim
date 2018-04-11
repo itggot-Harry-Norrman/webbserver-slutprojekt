@@ -1,60 +1,70 @@
 link rel="stylesheet" href="../css/style.css"/
 nav 
-    h1 
-        a href="/user" MyFitness
-    h3
-        a href="/user/info" = user_info[0][1]
+    .left
+        a href="/user" 
+            img src="../img/work_logo.png" alt="" class="logo_sz"
     .search
-        form action="/logout" method="POST"
-            input type="submit" value="Logout"
         form action="/search/user" method="POST"
-            input type="text" placeholder="Search Users" name="search_inp"
-            input type="submit" value="Search"
+            input type="text" placeholder="Search Users" name="search_inp" class="search_inp stand_shadow"
+            input type="submit" value="Search" class="nav_submit stand_shadow"
+        form action="/logout" method="POST"
+            input type="submit" value="Logout" class="nav_submit stand_shadow"
+        a href='/user/info' 
+            .user_inf.stand_shadow
+                    h3 style="color:black" #{user_info[0][1]}
+                    .circle
 img src="./img/add.svg" alt="" id="hide" class="add"
 .main_art
-    .add_post
-        form action="/excercise_add" method="post" class="add_post" id="excercise_add" name="add_form"
-            input type="text" name="excercise" placeholder="Excercise" 
-            h3 sets
-            input type="number" name="sets" min="0" max="100" step="1" value="3"
-            h3 reps
-            input type="number" name="reps" min="0" max="100" step="1" value="8"
-            select name="day"
-                option value="mon" Monday
-                option value="tue" Tuesday
-                option value="wed" Wednesday
-                option value="thu" Thursday
-                option value="fri" Friday
-                option value="sat" Saturday
-                option value="sun" Sunday
-            input type="submit" value="Post"
-.scheme_all
-    -scheme.each do |excercise|
-            - if excercise[4] == "mon"
-                .day
-                    h1 = excercise[1]
-                    / p =excercise[1].to_s + excercise[2].to_s + "x" excercise[3].to_s
-            - elsif excercise[4] == "tue"
-                .day
-                    = excercise[1]
-                    / p =excercise[1].to_s + excercise[2].to_s + "x" excercise[3].to_s
-            - elsif excercise[4] == "wed"
-                .day
-                    = excercise[1]
-                    / p =excercise[1].to_s + excercise[2].to_s + "x" excercise[3].to_s
-            - elsif excercise[4] == "thu"
-                .day
-                    = excercise[1]
-                    / p =excercise[1].to_s + excercise[2].to_s + "x" excercise[3].to_s
-            - elsif excercise[4] == "fri"
-                .day
-                    = excercise[1]
-                    / p =excercise[1].to_s + excercise[2].to_s + "x" excercise[3].to_s
-            - elsif excercise[4] == "sat"
-                .day
-                    = excercise[1]
-                    / p =excercise[1].to_s + excercise[2].to_s + "x" excercise[3].to_s
-            - elsif excercise[4] == "sun"
-                .day
-                    = excercise[1]
-                    / p =excercise[1].to_s + excercise[2].to_s + "x" excercise[3].to_s
+    .posts_article
+        .add_post
+            form action="/excercise_add" method="post" class="add_post" id="excercise_add" name="add_form"
+                input type="text" name="excercise" placeholder="Excercise" 
+                h3 reps
+                input type="number" name="reps" min="0" max="100" step="1" value="8"
+                h3 sets
+                input type="number" name="sets" min="0" max="100" step="1" value="3"
+                select name="day"
+                    option value="mon" Monday
+                    option value="tue" Tuesday
+                    option value="wed" Wednesday
+                    option value="thu" Thursday
+                    option value="fri" Friday
+                    option value="sat" Saturday
+                    option value="sun" Sunday
+                input type="submit" value="Add Excercise"
+        .add_stat 
+            h3 Add a Stat
+            form action="/add_stat" method="post"
+                input type="text" name="lift" placeholder="Lift"
+                input type="number" name="weight" min="0" step="1" value="100"
+                input type="submit" value="Add new stat"/
+/ .scheme_all
+/         -scheme.each do |excercise|
+/                 - if excercise[4] == "mon"
+/                     .day.mon
+/                         h1 mon
+/                         h1 #{excercise[1].to_s + " " + excercise[2].to_s + "x" + excercise[3].to_s}
+/                 - elsif excercise[4] == "tue"
+/                     .day.tue
+/                         h1 tue
+/                         h1 #{excercise[1].to_s + " " + excercise[2].to_s + "x" + excercise[3].to_s}
+/                 - elsif excercise[4] == "wed"
+/                     .day.wed
+/                         h1 wed
+/                         h1 #{excercise[1].to_s + " " + excercise[2].to_s + "x" + excercise[3].to_s}
+/                 - elsif excercise[4] == "thu"
+/                     .day.thu
+/                         h1 thu
+/                         h1 #{excercise[1].to_s + " " + excercise[2].to_s + "x" + excercise[3].to_s}
+/                 - elsif excercise[4] == "fri"
+/                     .day.fri
+/                         h1 fri
+/                         h1 #{excercise[1].to_s + " " + excercise[2].to_s + "x" + excercise[3].to_s}
+/                 - elsif excercise[4] == "sat"
+/                     .day.sat
+/                         h1 sat
+/                         h1 #{excercise[1].to_s + " " + excercise[2].to_s + "x" + excercise[3].to_s}
+/                 - elsif excercise[4] == "sun"
+/                     .day.sun
+/                         h1 sun
+/                         h1 #{excercise[1].to_s + " " + excercise[2].to_s + "x" + excercise[3].to_s}
