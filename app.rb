@@ -190,7 +190,8 @@ class App < Sinatra::Base
 		if session[:user_id]
 			user_info = db.execute("SELECT id, name FROM users WHERE id=?", session[:user_id])
 			scheme = db.execute("SELECT id, excercise, reps, sets, day FROM scheme WHERE user_id=?", session[:user_id])
-			slim(:info, locals:{user_info:user_info, scheme:scheme})
+			stats = db.execute("SELECT id, date, lift, weight FROM statistics WHERE user_id=?", session[:user_id])
+			slim(:info, locals:{user_info:user_info, scheme:scheme, stats:stats}) 	
 		else
 			redirect("/")
 		end
@@ -256,13 +257,23 @@ class App < Sinatra::Base
 			if session[:user_id]
 				packed_date = Time.now
 				packed_date = packed_date.to_s.split(" ")
-				date = packed_date[0][5..9]
+				date = packed_date[0][0..9]
 				weight = params[:weight].to_s + "kg"
-				db.execute("INSERT INTO statistics(date, lift, weight, user_id) VALUES(?,?,?,?)", [date, params[:lift].capitalize, weight, session[:user_id]])
+				lift_id = ["Squat", "Overhead Press", "Push Press", "Deadlift", "Sumo Deadlift", "Chin-up", "Pull-up", "Pendlay Row", "Bench Press", "Incline Bench Press", "Dip"]
+				lift_index = lift_id.index(params[:lift].capitalize)
+				db.execute("INSERT INTO statistics(date, lift, lift_id, weight, user_id) VALUES(?,?,?,?,?)", [date, params[:lift], lift_index, weight, session[:user_id]])
 				redirect('/user/info')
 			else
 				session[:msg] = stand
 				redirect('/')
+		end
+	end
+	post '/display_stat' do 
+	end
+	post '/remove_stat' do
+		db = SQLite3::Database.new("db/fitness.db")
+		if session[:user_id]
+		else
 		end
 	end
 end           

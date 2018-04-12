@@ -9,6 +9,42 @@ body {
     overflow-y: scroll;
     font-family: 'Anton', sans-serif;
 }
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+::-webkit-scrollbar-button {
+  width: 18px;
+  height: 18px;
+}
+::-webkit-scrollbar-thumb {
+  background: #ffffff;
+  border: 0px none rgba(0, 0, 0, 0);
+  border-radius: 59px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ffffff;
+}
+::-webkit-scrollbar-thumb:active {
+  background: #000000;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0);
+  border: 0px none #ffffff;
+  border-radius: 59px;
+}
+::-webkit-scrollbar-track:hover {
+  background: rgba(0, 0, 0, 0);
+}
+::-webkit-scrollbar {
+    background:transparent;
+}
+::-webkit-scrollbar-track:active {
+  background: rgba(0, 0, 0, 0);
+}
+::-webkit-scrollbar-corner {
+  background: rgba(0, 0, 0, 0);
+}
 h3 {
     letter-spacing: 2px;
     font-size: 2em;

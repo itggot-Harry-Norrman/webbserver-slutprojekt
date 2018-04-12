@@ -35,9 +35,38 @@ img src="./img/add.svg" alt="" id="hide" class="add"
         .add_stat 
             h3 Add a Stat
             form action="/add_stat" method="post"
-                input type="text" name="lift" placeholder="Lift"
+                Select  name="lift"
+                    option value="Squat" Squat
+                    option value="Overhead Press" Overhead Press
+                    option value="Push Press" Push Press
+                    option value="Deadlift" Deadlift
+                    option value="Sumo Deadlift" Sumo Deadlift
+                    option value="Chin-up" Chin-up
+                    option value="Pull-up" Pull-up
+                    option value="Pendlay Row" Pendlay Row
+                    option value="Bench Press" Bench Press
+                    option value="Incline Bench Press" Incline Bench Press
+                    option value="Dip" Dip
                 input type="number" name="weight" min="0" step="1" value="100"
-                input type="submit" value="Add new stat"/
+                input type="submit" value="Add new stat"
+        .stat_list
+            h3 Stats
+            form action="./display_stat" method="post"
+                h3 Display stat
+                Select  name="lift"
+                    option value="Squat" Squat
+                    option value="Overhead Press" Overhead Press
+                    option value="Push Press" Push Press
+                    option value="Deadlift" Deadlift
+                    option value="Sumo Deadlift" Sumo Deadlift
+                    option value="Chin-up" Chin-up
+                    option value="Pull-up" Pull-up
+                    option value="Pendlay Row" Pendlay Row
+                    option value="Bench Press" Bench Press
+                    option value="Incline Bench Press" Incline Bench Press
+                    option value="Dip" Dip
+            -stats.each do |single_stat|
+                h3 #{single_stat[1] + " " + single_stat[2] + " " + single_stat[3]}
 / .scheme_all
 /         -scheme.each do |excercise|
 /                 - if excercise[4] == "mon"
