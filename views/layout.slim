@@ -38,5 +38,4 @@ html lang="en"
             $('.sans_serif').click(function(){
                 $('.error').slideUp(400)
             });
-            var day = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][(new Date()).getDay()]
-            $('.change_day').append(day)
+            $('div.search_results:empty').append("<div class='search_boxes' style='justify-content: space-around;'><h3>No results for this search</h3></div>")

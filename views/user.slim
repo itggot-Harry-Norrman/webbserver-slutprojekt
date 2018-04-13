@@ -12,12 +12,16 @@ nav
             .user_inf.stand_shadow
                     h3 style="color:black" #{user_info[0][0]}
                     .circle
+                        img.account_size src="./img/account_circle.png" alt=""/
 .add.stand_shadow id="hide"
     h4.add_cross +
 .main_art
     .scheme
-        h1.change_day
-        - day = Time.now.strftime("%A")[0 .. 2].downcase
+        .single_box.align_title.stand_shadow
+            h1.change_day
+                - day = Time.now.strftime("%A")
+                = day
+                - day = day[0 .. 2].downcase
         - schedule.each do |excercise|
             - if excercise[4] == day
                 .scheme_box.stand_shadow
@@ -37,36 +41,38 @@ nav
 
     article.posts_article
         .add_post.stand_shadow
-            form action="/add_post" method="post" class="add_form" id="add_post" name="add_form"
+            form action="/add_post" method="post" class="add_form" name="add_form"
                 .post_title
                     input.h3_imit type="text" name="title" placeholder="title"
-                .post_add_content
-                textarea cols="30" rows="10" type="text" name="text_content" placeholder="write your post here" id="content"
-                .choice
+                .content
                     input type="radio" name="status" value="private" id="private"
                         label for="private" private
                     input type="radio" name="status" value="public" id="public"
                         label for="public" public
-                input.inp_sbm.radius_btn type="submit" value="Post"
+                    .comment_here
+                        .comment_form 
+                            textarea.inp_area.line_height cols="300" rows="2" type="text" name="text_content" placeholder="Write your post here..." id="content"
+                            input.inp_sbm type="submit" value="Post"
         - priv_posts.each do |content|
             .post
-                .title.
-                    h3 = content[0].capitalize
-                .content.stand_shadow
-                    p = content[1]
-                    .comment_here
-                        form action="/comment_private" method="post" class="comment_form"
-                            textarea cols="300" rows="2" type="text" name="comment" class="inp_area line_height"
-                            input type="hidden" name="post_id" value="#{content[3]}"
-                            input type="hidden" name="name" value="#{user_info[0][0]}"
-                            input type="submit" value="Comment" class="inp_sbm"
+                .stand_shadow.box_radius
+                    .title
+                        h3 = content[0].capitalize
+                    .content
+                        p = content[1]
+                        .comment_here
+                            form action="/comment_private" method="post" class="comment_form"
+                                textarea cols="300" rows="2" type="text" name="comment" class="inp_area line_height" placeholder="Write your comment here"
+                                input type="hidden" name="post_id" value="#{content[3]}"
+                                input type="hidden" name="name" value="#{user_info[0][0]}"
+                                input type="submit" value="Comment" class="inp_sbm"
                 .show_comment
-                    p class="plus" +
-                    .comments
-                        -comments.each do |comment_single|
-                            - if comment_single[1] == content[3]
-                                .comment
-                                    p #{comment_single[0]+ "-" + comment_single[3]}
+                        p class="plus" +
+                        .comments
+                            -comments.each do |comment_single|
+                                - if comment_single[1] == content[3]
+                                    .comment
+                                        p #{comment_single[0]+ "-" + comment_single[3]}
 
         - public_posts.each do |content|
             .post
@@ -88,16 +94,23 @@ nav
                                     p #{comment_single[0]+ "-" + comment_single[3]}
     .friend_box
         .friends
-            h1.font_color Friends
+            .scheme_box.align_title.stand_shadow
+                h3.font_color.change_day Friends
             -friends.each do |friend|
                 .single_box.stand_shadow
-                    h3 =friend
-                    form action="/remove_friend" method="post"
-                        input type="hidden" name="remove" value="#{friend}"
-                        input.remove type="submit" value="+"
+                    -change.each do |friend_stat|
+                        -if friend_stat[1] == friend[0]
+                            .stat_single
+                                p.orkar #{friend_stat[2]} 
+                                p.orkar #{friend_stat[0]}
+                    .stat_single_right
+                        h3 =friend[1]
+                        form action="/remove_friend" method="post"
+                            input type="hidden" name="remove" value="#{friend[1]}"
+                            input.remove type="submit" value="+"
         .request_click
             .request_title
-                h3 Friend Requests
+                h1 Friend Requests
                 img.arrow_size src="./img/arrow.png" alt=""
             .requests 
                 -friend_requests.each do |single|
