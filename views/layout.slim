@@ -20,6 +20,10 @@ html lang="en"
             $("#hide").click(function(){
                 $(this).toggleClass("rotate_this")
                 $(".add_post").slideToggle(400);
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
             });
             $('.plus').click(function(){
                 $(this).siblings(this).slideToggle(400)
@@ -33,7 +37,7 @@ html lang="en"
                 $('.requests').slideToggle(400)
             });
             $('div.requests:empty').append('<p>You have no friend requests at the moment</p>')
-            $('div.comments:empty').append('<p>This post has not yet been commented on</p>')
+            $('div.overflow_test:empty').append('<p>This post has not yet been commented on</p>')
             $('div.error:empty').hide()
             $('.sans_serif').click(function(){
                 $('.error').slideUp(400)

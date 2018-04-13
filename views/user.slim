@@ -2,17 +2,20 @@ nav
     .left
         a href="/user" 
             img src="./img/work_logo.png" alt="" class="logo_sz"
-    .search
-        form action="/search/user" method="POST"
-            input type="text" placeholder="Search Users" name="search_inp" class="search_inp stand_shadow"
-            input type="submit" value="Search" class="nav_submit stand_shadow"
-        form action="/logout" method="POST"
-            input type="submit" value="Logout" class="nav_submit stand_shadow"
-        a href='/user/info' 
-            .user_inf.stand_shadow
-                    h3 style="color:black" #{user_info[0][0]}
-                    .circle
-                        img.account_size src="./img/account_circle.png" alt=""/
+    .right_2nd
+        .search
+            form.media_form action="/search/user" method="POST"
+                input type="text" placeholder="Search Users" name="search_inp" class="search_inp stand_shadow"
+                input type="submit" value=">" class="nav_submit stand_shadow desk_hide"
+                input type="submit" value="Search" class="nav_submit stand_shadow mob_hide2"
+        .logout    
+                form.media_size action="/logout" method="POST"
+                    input type="submit" value="Logout" class="nav_submit stand_shadow"
+                    a href='/user/info' 
+                        .user_inf.stand_shadow.name
+                                h3 style="color:black" #{user_info[0][0]}
+                                .circle
+                                    img.account_size src="./img/account_circle.png" alt=""/
 .add.stand_shadow id="hide"
     h4.add_cross +
 .main_art
@@ -33,8 +36,10 @@ nav
             .scheme_box.stand_shadow
                 form.add_spec action="/excercise_add" method="post"
                     input.excercise_spec type="text" name="excercise" placeholder="Excercise" 
-                    input.number_spec type="number" name="reps" min="0" max="100" step="1" value="8"
-                    input.number_spec type="number" name="sets" min="0" max="100" step="1" value="3"
+                    .reps_x
+                        input.number_spec type="number" name="reps" min="0" max="100" step="1" value="8"
+                        h4 x
+                        input.number_spec type="number" name="sets" min="0" max="100" step="1" value="3"
                     input type="hidden" name="day" value="#{day}"
                     input type="hidden" name="link" value="user"
                     input.submit_spec type="submit" value="+"
@@ -62,17 +67,18 @@ nav
                         p = content[1]
                         .comment_here
                             form action="/comment_private" method="post" class="comment_form"
-                                textarea cols="300" rows="2" type="text" name="comment" class="inp_area line_height" placeholder="Write your comment here"
+                                textarea cols="300" rows="2" type="text" name="comment" class="inp_area line_height" placeholder="Write your comment here..."
                                 input type="hidden" name="post_id" value="#{content[3]}"
                                 input type="hidden" name="name" value="#{user_info[0][0]}"
                                 input type="submit" value="Comment" class="inp_sbm"
                 .show_comment
                         p class="plus" +
                         .comments
-                            -comments.each do |comment_single|
-                                - if comment_single[1] == content[3]
-                                    .comment
-                                        p #{comment_single[0]+ "-" + comment_single[3]}
+                            .overflow_test
+                                -comments.each do |comment_single|
+                                    - if comment_single[1] == content[3]
+                                        .comment
+                                            p #{comment_single[0]+ "-" + comment_single[3]}
 
         - public_posts.each do |content|
             .post
@@ -82,16 +88,17 @@ nav
                     p = content[1]
                     .comment_here
                         form action="/comment_public" method="post" class="comment_form"
-                            textarea name="comment" cols="300" rows="2" class="inp_area line_height"
+                            textarea name="comment" cols="300" rows="2" class="inp_area line_height" placeholder="Write your comment here..."
                             input type="hidden" name="post_id" value="#{content[3]}"
                             input type="submit" value="comment" class="inp_sbm"
                 .show_comment
                     p class="plus" +
                     .comments
-                        -comments.each do |comment_single|
-                            - if comment_single[1] == content[3]
-                                .comment
-                                    p #{comment_single[0]+ "-" + comment_single[3]}
+                        .overflow_test
+                            -comments.each do |comment_single|
+                                - if comment_single[1] == content[3]
+                                    .comment
+                                        p #{comment_single[0]+ "-" + comment_single[3]}
     .friend_box
         .friends
             .scheme_box.align_title.stand_shadow

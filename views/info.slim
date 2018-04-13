@@ -3,17 +3,19 @@ nav
     .left
         a href="/user" 
             img src="../img/work_logo.png" alt="" class="logo_sz"
-    .search
-        form action="/search/user" method="POST"
-            input type="text" placeholder="Search Users" name="search_inp" class="search_inp stand_shadow"
-            input type="submit" value="Search" class="nav_submit stand_shadow"
-        form action="/logout" method="POST"
-            input type="submit" value="Logout" class="nav_submit stand_shadow"
-        a href='/user/info' 
-            .user_inf.stand_shadow
-                    h3 style="color:black" #{user_info[0][1]}
-                    .circle
-                        img.account_size src="../img/account_circle.png" alt=""/
+    .right_2nd
+        .search
+            form.media_form action="/search/user" method="POST"
+                input type="text" placeholder="Search Users" name="search_inp" class="search_inp stand_shadow"
+                input type="submit" value="Search" class="nav_submit stand_shadow"
+        .logout    
+                form action="/logout" method="POST"
+                input type="submit" value="Logout" class="nav_submit stand_shadow"
+                a href='/user/info' 
+                    .user_inf.stand_shadow
+                            h3 style="color:black" #{user_info[0][1]}
+                            .circle
+                                img.account_size src="../img/account_circle.png" alt=""/
 .main_art.info_art
     .add_stat.stand_shadow
                 .title.stat_title 
@@ -29,7 +31,7 @@ nav
                         .reps
                             h3 sets
                             input.stand_inp type="number" name="sets" min="0" max="100" step="1" value="3"
-                    select.stand_inp.self_align  name="day"
+                    select.stand_inp.self_align.select_inp  name="day"
                         option.opt value="mon" Monday
                         option.opt value="tue" Tuesday
                         option.opt value="wed" Wednesday
@@ -37,12 +39,12 @@ nav
                         option.opt value="fri" Friday
                         option.opt value="sat" Saturday
                         option.opt value="sun" Sunday
-                    input.nav_submit type="submit" value="Add Excercise"
+                    input.nav_submit.size type="submit" value="Add Excercise"
     .add_stat.stand_shadow
             .title.stat_title
                 h3 Add a Stat
             form.add_ex action="/add_stat" method="post"
-                Select.stand_inp.self_align  name="lift"
+                Select.stand_inp.self_align.select_inp  name="lift"
                     option value="Squat" Squat
                     option value="Overhead Press" Overhead Press
                     option value="Push Press" Push Press
@@ -57,9 +59,9 @@ nav
                 input.stand_inp.self_align type="number" name="weight" min="0" step="1" value="100"
                 input.nav_submit.self_align type="submit" value="Add new stat"
             .display
-                h3 Display stat
+                h3.display_font Display stat
                 form.display action="/display_stat" method="post"
-                    Select.stand_inp  name="lift"
+                    Select.stand_inp.select_inp  name="lift"
                         option value="Squat" Squat
                         option value="Overhead Press" Overhead Press
                         option value="Push Press" Push Press
@@ -76,12 +78,13 @@ nav
             .title.stat_title
                 h3 Statistics
             .stats
-                -stats.each do |single_stat|
-                    .single_stat
-                        p #{single_stat[1] + " " + single_stat[2] + " " + single_stat[3]}
-                        form action="/remove_stat" method="post"
-                            input name="stat_id"type="hidden" value="#{single_stat[0]}"
-                            input.remove type="submit" value="+"
+                .test
+                    -stats.each do |single_stat|
+                        .single_stat
+                            p #{single_stat[1] + " " + single_stat[2] + " " + single_stat[3]}
+                            form action="/remove_stat" method="post"
+                                input name="stat_id"type="hidden" value="#{single_stat[0]}"
+                                input.remove type="submit" value="+"
                     
 script src="../js/jquery-3.2.1.min.js"
 / .scheme_all

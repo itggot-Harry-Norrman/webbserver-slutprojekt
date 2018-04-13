@@ -6,7 +6,6 @@ class App < Sinatra::Base
 	get '/' do
 		db = SQLite3::Database.new("db/fitness.db")
 		public_posts = db.execute("SELECT title, content, id FROM posts WHERE status=?","public")
-		p public_posts
 		comments = db.execute("SELECT content, post_id, user_id, user_name FROM comments WHERE post_id=(SELECT id FROM posts WHERE status='public')")
 		public_posts = public_posts.reverse
 		slim(:index, locals:{msg: session[:msg], public_posts:public_posts, comments:comments})
@@ -62,7 +61,6 @@ class App < Sinatra::Base
 			end
 		end
 	end
-
 	get('/user') do
 		db = SQLite3::Database.new("db/fitness.db")
 		status = "public"
@@ -91,7 +89,6 @@ class App < Sinatra::Base
 				friend_test << friend_n_i
 				friend_index += 2
 			end
-			p friend_test
 			index_friends = 0
 			friend_ids = []
 			friend_names = []
@@ -143,7 +140,6 @@ class App < Sinatra::Base
 				end
 				change_a << change_v
 				change << change_a
-				p change
 			end
 			slim(:user, locals:{friend_requests:friend_requests, public_posts:posts, priv_posts:priv_arr, friends:friend_test, user_info:user_info, comments:comments, schedule:schedule, change:change})
 		else
@@ -168,6 +164,7 @@ class App < Sinatra::Base
 		friends << friends1 << friends2
 		friends = friends.flatten
 		friend_test = []
+		friend_requests = db.execute("SELECT name, id FROM users WHERE id=(SELECT adding_id FROM relations WHERE added_id=? AND status=0)", session[:user_id])
 		friend_index = 0
 		while friend_index < friends.length - 1
 			friend_n_i = []
@@ -176,7 +173,6 @@ class App < Sinatra::Base
 			friend_test << friend_n_i
 			friend_index += 2
 		end
-		p friend_test
 		index_friends = 0
 		friend_ids = []
 		friend_names = []
@@ -231,7 +227,7 @@ class App < Sinatra::Base
 		comments = db.execute("SELECT content, post_id, user_id, user_name FROM comments")
 		schedule = db.execute("SELECT id, excercise, reps, sets, day FROM scheme WHERE user_id=?", session[:user_id])
 		stats = db.execute("SELECT * FROM statistics WHERE user_id IN (?)", session[:user_id])
-		slim(:search, locals:{search_arr:search_arr, friends:friend_test, user_info:user_info, schedule:schedule, searched:searched, change:change})
+		slim(:search, locals:{search_arr:search_arr, friends:friend_test, user_info:user_info, schedule:schedule, searched:searched, change:change, friend_requests:friend_requests})
 		else
 			session[:msg] = "You need to login to be able to search for users"
 			redirect("/")
@@ -240,11 +236,15 @@ class App < Sinatra::Base
 
 	post '/add_post' do
 		db = SQLite3::Database.new("db/fitness.db")
-		if session[:user_id]
+		if session[:user_id] and params[:text_content] != "" and params[:title] != ""
 			title = params[:title]
-			content = params[:text_content]
+			name = db.execute("SELECT name FROM users WHERE id=?", session[:user_id])
+			content = params[:text_content] + "-#{name[0][0]}"
 			status = params[:status]
 			id = session[:user_id]
+			if status == nil
+				status  = "private"
+			end
 			db.execute("INSERT INTO posts('title', 'content', 'status', 'user_id') VALUES (?,?,?,?)", [title, content, status, id])
 			redirect("/user")
 		else
@@ -342,7 +342,7 @@ class App < Sinatra::Base
 	end
 	post '/excercise_add' do
 		db = SQLite3::Database.new("db/fitness.db")
-		if session[:user_id] 
+		if session[:user_id] and params[:excercise] != ""
 			if params[:excercise].size < 14
 			db.execute("INSERT INTO scheme(excercise, reps, sets, day, user_id) VALUES(?,?,?,?,?)", params[:excercise], params[:reps], params[:sets], params[:day], session[:user_id])
 				if params[:link]
@@ -354,6 +354,12 @@ class App < Sinatra::Base
 			else
 				session[:msg] = stand
 				redirect('/')
+			end
+		else
+			if params[:link]
+				redirect('/user')
+			else
+				redirect('/user/info')
 			end
 		end
 	end
