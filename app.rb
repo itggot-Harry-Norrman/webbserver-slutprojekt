@@ -304,7 +304,7 @@ class App < Sinatra::Base
 		db = SQLite3::Database.new("db/fitness.db")
 		if session[:user_id]
 			user_info = db.execute("SELECT id, name FROM users WHERE id=?", session[:user_id])
-			scheme = db.execute("SELECT id, excercise, reps, sets, day FROM scheme WHERE user_id=?", session[:user_id])
+			scheme = db.execute("SELECT excercise, reps, sets, day, id FROM scheme WHERE user_id=?", session[:user_id])
 			stats = db.execute("SELECT id, date, lift, weight FROM statistics WHERE user_id=?", session[:user_id])
 			slim(:info, locals:{user_info:user_info, scheme:scheme, stats:stats}) 	
 		else
@@ -343,7 +343,7 @@ class App < Sinatra::Base
 	post '/excercise_add' do
 		db = SQLite3::Database.new("db/fitness.db")
 		if session[:user_id] and params[:excercise] != ""
-			if params[:excercise].size < 14
+			if params[:excercise].size < 18
 			db.execute("INSERT INTO scheme(excercise, reps, sets, day, user_id) VALUES(?,?,?,?,?)", params[:excercise], params[:reps], params[:sets], params[:day], session[:user_id])
 				if params[:link]
 					redirect('/user')

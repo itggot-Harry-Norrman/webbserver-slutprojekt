@@ -702,9 +702,7 @@ textarea:focus {
     border-bottom: solid 2px rgba(0, 0, 0, 0.5);
     height: 350px;
 }
-.info_art {
-    justify-content: space-around;
-}
+
 .opacity {
     opacity: 0;
     transition: 0.1s;
@@ -784,7 +782,26 @@ div::-webkit-scrollbar-thumb {
     border-bottom-right-radius: 10px;
     border-top-right-radius: 10px;
 }
-
+.ovning {
+    background-color: #f7ea5a;
+    border: 2px solid rgba(0, 0, 0, 0.3);
+    width: calc(100vw/7 - 5px * 7);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    justify-content: flex-end;
+    border-radius: 10px;
+}   
+.day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: calc(100vw/7 - 5px * 7)
+}
 .stand_inp {
     background-color: rgba(255,255,255,0.3);
     border-radius: 5px;
@@ -838,6 +855,16 @@ div::-webkit-scrollbar-thumb {
     border-radius: 150%;
     height: 25px;
     width: 25px;    
+}
+.info_art {
+    justify-content: space-around;
+    flex-direction: column;
+}
+section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100vw;
 }
 @media only screen and (max-width: 1074px) {
     .main_art {

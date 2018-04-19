@@ -36,6 +36,7 @@ html lang="en"
                 $(this).toggleClass("rotate_arrow");
                 $('.requests').slideToggle(400)
             });
+            $('div.ovning:empty').hide();
             $('div.requests:empty').append('<p>You have no friend requests at the moment</p>')
             $('div.overflow_test:empty').append('<p>This post has not yet been commented on</p>')
             $('div.error:empty').hide()
