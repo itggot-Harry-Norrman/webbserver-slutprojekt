@@ -93,9 +93,9 @@ nav
                     .ovning
                         -if ovning[3] == "mon"
                             = ovning[0] +" "+ ovning[1].to_s + "x" + ovning[2].to_s
-                            form.delete action="/delete_excercise" method="post"
+                            form action="/delete_excercise" method="post"
                                 input type="hidden" name="excercise_id" value="#{ovning[4]}"
-                                input type="submit" value="x"
+                                input.remove type="submit" value="+"
             .day
                 h3 Tuesday
                 - scheme.each do |ovning|
