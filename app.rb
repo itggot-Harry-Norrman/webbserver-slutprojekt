@@ -1,147 +1,71 @@
-class App < Sinatra::Base
-	enable :sessions
+require_relative './auth.rb'
+require_relative './users.rb'
+require_relative './posts.rb'
 
+
+class App < Sinatra::Base
+	include Auth
+	include Users
+	include Posts
+	
+	enable :sessions
 	stand = "You are not logged in"
 
 	get '/' do
-		db = SQLite3::Database.new("db/fitness.db")
-		public_posts = db.execute("SELECT title, content, id FROM posts WHERE status=?","public")
-		comments = db.execute("SELECT content, post_id, user_id, user_name FROM comments WHERE post_id=(SELECT id FROM posts WHERE status='public')")
-		public_posts = public_posts.reverse
-		slim(:index, locals:{msg: session[:msg], public_posts:public_posts, comments:comments})
+		posts = Posts::stand_post
+		slim(:index, locals:{msg: session[:msg], public_posts:posts[0], comments:posts[1]})
 	end
 	get '/register_site' do
 		slim(:register)
 	end
 	post '/register' do 
-		db = SQLite3::Database.new("db/fitness.db")
-		username = params[:username]
-		password = BCrypt::Password.create( params[:password] )
-		password2 = BCrypt::Password.create( params[:password2] )
-		if username == "" || password == "" || password == ""
-			session[:msg] = "Please enter a username and password."
-		elsif params[:password] != params[:password2]
-			session[:msg] = "Passwords don't match"
-		elsif db.execute("SELECT name FROM users WHERE name=?", username) != []
-			session[:msg] = "Username already exists"
-		elsif username.size > 14
-			session[:msg] = "Username is too long maximum length of username is 14 characters"
+		result = Auth::register(params[:username], params[:password], params[:password2])
+		result += -1 
+		if result != 5 
+			session[:msg] = ["Please enter a username and password.","Passwords don't match","Username already exists","Username is too long maximum length of username is 14 characters"][result]
 		else
-			db.execute("INSERT INTO users ('name', 'password', 'show_stat') VALUES (?,?,?)", [username, password, 0])
 		end
-		redirect('/')
+		# if result == 1
+		# 	session[:msg] = "Please enter a username and password."
+		# elsif result == 2
+		# 	session[:msg] = "Passwords don't match"
+		# elsif result == 3
+		# 	session[:msg] = "Username already exists"
+		# elsif result == 4
+		# 	session[:msg] = "Username is too long maximum length of username is 14 characters"
+		# else
+		# end
+		redirect("/")
 	end
 
 	post('/login') do
-		db = SQLite3::Database.new("db/fitness.db")
 		username = params[:username]
 		password = params[:password]
-		if username == "" || password == ""
+		result = Auth::login(username, password)
+		if result == 2
 			session[:msg] = "Please enter a username and a password."
 			redirect('/')
 		else
-			db_password = db.execute("SELECT password FROM users WHERE name=?", username)
-			if db_password == []
+			if result == 3
 				session[:msg] = "Username doesn't exist"
 				redirect('/')
-			else
-				db_password = db_password[0][0]
-				password_digest =  db_password
-				password_digest = BCrypt::Password.new( password_digest )
-				if password_digest == password
-					user_id = db.execute("SELECT id FROM users WHERE name=?", username)
-					user_id = user_id[0][0]
-					session[:user_id] = user_id
-					redirect('/user')
 				else
-					session[:user_id] = nil
-					session[:msg] = "Wrong password or username"
-					redirect('/')
+					if result[0] == 1
+					session[:user_id] = result[1]
+					redirect("/user")
+					else 
+						session[:user_id] = nil
+						session[:msg] = "Wrong password or username"
+						redirect("/")
+					end
 				end
 			end
-		end
 	end
 	get('/user') do
-		db = SQLite3::Database.new("db/fitness.db")
-		status = "public"
-		if session[:user_id]
-			posts = db.execute("SELECT title, content, user_id, id FROM posts WHERE status='public'")
-			friend_requests = db.execute("SELECT name, id FROM users WHERE id=(SELECT adding_id FROM relations WHERE added_id=? AND status=0)", session[:user_id])
-			priv_posts = db.execute("SELECT title, content, user_id, id FROM posts WHERE status='private'")
-			priv_arr = []
-			priv_posts.each do |priv_post|
-				if db.execute("SELECT status FROM relations WHERE adding_id=? AND added_id=?", [session[:user_id], priv_post[2]])[0] == [1] or db.execute("SELECT status FROM relations WHERE adding_id=? AND added_id=? ", [priv_post[2], session[:user_id]])[0] == [1] or priv_post[2] == session[:user_id]
-					priv_arr << priv_post
-				end
-			end
-			user_info = db.execute("SELECT name, id FROM users WHERE id=?", session[:user_id])
-			friends1 = db.execute("SELECT id,name FROM users WHERE id in (SELECT added_id FROM relations WHERE status='1' AND adding_id=?)", session[:user_id])
-			friends2 = db.execute("SELECT id,name FROM users WHERE id in (SELECT adding_id FROM relations WHERE status='1' AND added_id=?)", session[:user_id])
-			friends = []
-			friends << friends1 << friends2
-			friends = friends.flatten
-			friend_test = []
-			friend_index = 0
-			while friend_index < friends.length - 1
-				friend_n_i = []
-				friend_n_i << friends[friend_index]
-				friend_n_i << friends[friend_index + 1]
-				friend_test << friend_n_i
-				friend_index += 2
-			end
-			index_friends = 0
-			friend_ids = []
-			friend_names = []
-			friends.each do |friend_inf|
-				if index_friends/2 == index_friends.to_f/2
-					friend_ids << friend_inf
-					index_friends += 1
-				else
-					friend_names << friend_inf
-					index_friends += 1
-				end
-			end
-			id_and_stat = []
-			friend_ids.each do |friend_id|
-				show_stat_friends = db.execute("SELECT id, show_stat FROM users WHERE id=?", friend_id)
-				id_and_stat << show_stat_friends
-			end
-			session[:friend_ids] = friend_ids
-			comments = db.execute("SELECT content, post_id, user_id, user_name FROM comments")
-			priv_arr = priv_arr.reverse
-			posts = posts.reverse
-			schedule = db.execute("SELECT id, excercise, reps, sets, day FROM scheme WHERE user_id=?", session[:user_id])
-			stats = db.execute("SELECT * FROM statistics WHERE user_id IN (?)", session[:user_id])
-			friend_stats = []
-			id_and_stat.each do |ins|
-					friend_stat = db.execute("SELECT lift_id, weight, user_id FROM statistics WHERE user_id=? AND lift_id=?", [ins[0][0], ins[0][1]])
-					if friend_stat == []
-						friend_stats << [[ins[0][1], "1kg", ins[0][0]]]
-					else
-					friend_stats << friend_stat
-					end
-			end
-			lift_id = ["Squat", "Overhead Press", "Push Press", "Deadlift", "Sumo Deadlift", "Chin-up", "Pull-up", "Pendlay Row", "Bench Press", "Incline Bench Press", "Dip"]
-			change=[]
-			friend_stats.each do |all_stats|
-				change_a = []
-				start_stat = all_stats[0]
-				change_a << lift_id[start_stat[0]]
-				change_a << start_stat[2]
-				end_stat = all_stats.last
-				start_stat = start_stat[1].split(//).map {|x| x[/\d+/]}.compact.join("").to_i
-				end_stat = end_stat[1].split(//).map {|x| x[/\d+/]}.compact.join("").to_i
-				change_v = (end_stat/start_stat.to_f)
-				change_v = ((change_v*100) - 100)
-				if change_v.abs == change_v
-					change_v = "+" + change_v.to_s + "%"
-				else
-					change_v = change_v.to_s + "%"
-				end
-				change_a << change_v
-				change << change_a
-			end
-			slim(:user, locals:{friend_requests:friend_requests, public_posts:posts, priv_posts:priv_arr, friends:friend_test, user_info:user_info, comments:comments, schedule:schedule, change:change})
+		results = Users::user(session[:user_id])
+		if results != 0
+			session[:friend_ids] = results[8]
+			slim(:user, locals:{friend_requests:results[0], public_posts:results[1], priv_posts:results[2], friends:results[3], user_info:results[4], comments:results[5], schedule:results[6], change:results[7]})
 		else
 			session[:msg] = stand
 			redirect("/")
@@ -153,83 +77,13 @@ class App < Sinatra::Base
 	end
 
 	get '/search/:search_inp' do
-		db = SQLite3::Database.new("db/fitness.db")
-		if session[:user_id]
-		searched = params[:search_inp]
-		search_arr = db.execute("SELECT name, id FROM users WHERE name LIKE ?", ["%"+searched+"%"])
-		user_info = db.execute("SELECT name, id FROM users WHERE id=?", session[:user_id])
-		friends1 = db.execute("SELECT id,name FROM users WHERE id in (SELECT added_id FROM relations WHERE status='1' AND adding_id=?)", session[:user_id])
-		friends2 = db.execute("SELECT id,name FROM users WHERE id in (SELECT adding_id FROM relations WHERE status='1' AND added_id=?)", session[:user_id])
-		friends = []
-		friends << friends1 << friends2
-		friends = friends.flatten
-		friend_test = []
-		friend_requests = db.execute("SELECT name, id FROM users WHERE id=(SELECT adding_id FROM relations WHERE added_id=? AND status=0)", session[:user_id])
-		friend_index = 0
-		while friend_index < friends.length - 1
-			friend_n_i = []
-			friend_n_i << friends[friend_index]
-			friend_n_i << friends[friend_index + 1]
-			friend_test << friend_n_i
-			friend_index += 2
-		end
-		index_friends = 0
-		friend_ids = []
-		friend_names = []
-		friends.each do |friend_inf|
-			if index_friends/2 == index_friends.to_f/2
-				friend_ids << friend_inf
-				index_friends += 1
-			else
-				friend_names << friend_inf
-				index_friends += 1
-			end
-		end
-		id_and_stat = []
-		friend_ids.each do |friend_id|
-			show_stat_friends = db.execute("SELECT id, show_stat FROM users WHERE id=?", friend_id)
-			id_and_stat << show_stat_friends
-		end
-		session[:friend_ids] = friend_ids
-		comments = db.execute("SELECT content, post_id, user_id, user_name FROM comments")
-		schedule = db.execute("SELECT id, excercise, reps, sets, day FROM scheme WHERE user_id=?", session[:user_id])
-		stats = db.execute("SELECT * FROM statistics WHERE user_id IN (?)", session[:user_id])
-		friend_stats = []
-		id_and_stat.each do |ins|
-				friend_stat = db.execute("SELECT lift_id, weight, user_id FROM statistics WHERE user_id=? AND lift_id=?", [ins[0][0], ins[0][1]])
-				if friend_stat == []
-					friend_stats << [[ins[0][1], "1kg", ins[0][0]]]
-				else
-				friend_stats << friend_stat
-				end
-		end
-		lift_id = ["Squat", "Overhead Press", "Push Press", "Deadlift", "Sumo Deadlift", "Chin-up", "Pull-up", "Pendlay Row", "Bench Press", "Incline Bench Press", "Dip"]
-		change=[]
-		friend_stats.each do |all_stats|
-			change_a = []
-			start_stat = all_stats[0]
-			change_a << lift_id[start_stat[0]]
-			change_a << start_stat[2]
-			end_stat = all_stats.last
-			start_stat = start_stat[1].split(//).map {|x| x[/\d+/]}.compact.join("").to_i
-			end_stat = end_stat[1].split(//).map {|x| x[/\d+/]}.compact.join("").to_i
-			change_v = (end_stat/start_stat.to_f)
-			change_v = ((change_v*100) - 100)
-			if change_v.abs == change_v
-				change_v = "+" + change_v.to_s + "%"
-			else
-				change_v = change_v.to_s + "%"
-			end
-			change_a << change_v
-			change << change_a
-			change
-		end
-		comments = db.execute("SELECT content, post_id, user_id, user_name FROM comments")
-		schedule = db.execute("SELECT id, excercise, reps, sets, day FROM scheme WHERE user_id=?", session[:user_id])
-		stats = db.execute("SELECT * FROM statistics WHERE user_id IN (?)", session[:user_id])
-		slim(:search, locals:{search_arr:search_arr, friends:friend_test, user_info:user_info, schedule:schedule, searched:searched, change:change, friend_requests:friend_requests})
+		results = Users::user(session[:user_id])
+		search = Users::search(session[:user_id], params[:search_inp])
+		if results != 0
+		session[:friend_ids] = results[8]
+		slim(:search, locals:{search_arr:search[3], friends:results[3], user_info:results[4], schedule:search[3], searched:params[:search_inp], change:results[7], friend_requests:results[0]})
 		else
-			session[:msg] = "You need to login to be able to search for users"
+			session[:msg] = stand
 			redirect("/")
 		end
 	end
@@ -301,13 +155,11 @@ class App < Sinatra::Base
 		end
 	end
 	get '/user/info' do
-		db = SQLite3::Database.new("db/fitness.db")
 		if session[:user_id]
-			user_info = db.execute("SELECT id, name FROM users WHERE id=?", session[:user_id])
-			scheme = db.execute("SELECT excercise, reps, sets, day, id FROM scheme WHERE user_id=?", session[:user_id])
-			stats = db.execute("SELECT id, date, lift, weight FROM statistics WHERE user_id=?", session[:user_id])
-			slim(:info, locals:{user_info:user_info, scheme:scheme, stats:stats}) 	
+			results = Users::info(session[:user_id])
+			slim(:info, locals:{user_info:results[0], scheme:results[1], stats:results[2]}) 	
 		else
+			session[:msg] = stand
 			redirect("/")
 		end
 	end
@@ -315,13 +167,13 @@ class App < Sinatra::Base
 		db = SQLite3::Database.new("db/fitness.db")
 		if session[:user_id]
 			#fixa injections via privata comments
-			test_id = db.execute("SELECT id FROM users WHERE id=(SELECT user_id FROM posts WHERE id=?)", params[:post_id])[0][0]  
-			if db.execute("SELECT name FROM users WHERE id=?", session[:user_id])[0][0] == params[:name] and session[:friend_ids].include?(test_id) == true  
+			test_id = db.execute("SELECT id FROM users WHERE id=(SELECT user_id FROM posts WHERE id=?)", params[:post_id])[0][0]
+			if db.execute("SELECT name FROM users WHERE id=?", session[:user_id])[0][0] == params[:name] or session[:friend_ids].include?(test_id) == true
 			name = db.execute("SELECT name FROM users WHERE id=?", session[:user_id])
 			db.execute("INSERT INTO comments(content, post_id, user_id, user_name) VALUES(?,?,?,?)", [params[:comment], params[:post_id], session[:user_id], name])
 			redirect('/user')
 			else
-				session[:msg] == "Unauthorized action detected"
+				session[:msg] = "Unauthorized action detected"
 				redirect("/")
 			end
 		else

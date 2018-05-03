@@ -9,12 +9,12 @@ nav
                 input type="submit" value=">" class="nav_submit stand_shadow desk_hide"
                 input type="submit" value="Search" class="nav_submit stand_shadow mob_hide2"
         .logout    
-                form.media_size action="/logout" method="POST"
-                    input type="submit" value="Logout" class="nav_submit stand_shadow"
-                    a href='/user/info' 
-                        .user_inf.stand_shadow.name
-                                h3 style="color:black" #{user_info[0][0]}
-                                .circle
+            form.media_size action="/logout" method="POST"
+                input type="submit" value="Logout" class="nav_submit stand_shadow"
+                a href='/user/info' 
+                    .user_inf.stand_shadow.name
+                            h3 style="color:black" #{user_info[0][0]}
+                            .circle
                                     img.account_size src="./img/account_circle.png" alt=""/
 .add.stand_shadow id="hide"
     h4.add_cross +

@@ -9,11 +9,11 @@ nav
                 input type="text" placeholder="Search Users" name="search_inp" class="search_inp stand_shadow"
                 input type="submit" value="Search" class="nav_submit stand_shadow"
         .logout    
-                form action="/logout" method="POST"
-                    input type="submit" value="Logout" class="nav_submit stand_shadow"
+            form.media_size action="/logout" method="POST"
+                input type="submit" value="Logout" class="nav_submit stand_shadow"
                 a href='/user/info' 
-                    .user_inf.stand_shadow
-                            h3 style="color:black" #{user_info[0][1]}
+                    .user_inf.stand_shadow.name
+                            h3 style="color:black" #{user_info[0][0]}
                             .circle
                                 img.account_size src="../img/account_circle.png" alt=""/
 .main_art.info_art
@@ -21,7 +21,7 @@ nav
         .add_stat.stand_shadow
                     .title.stat_title 
                         h3 Add an Excercise
-                    form action="/excercise_add" method="post" class="add_ex" name="add_form"
+                    form action="/excercise_add" method="post"class="add_ex" name="add_form"
                         input.stand_inp.self_align type="text" name="excercise" placeholder="Excercise" 
                         .rep
                             .reps
@@ -90,7 +90,7 @@ nav
             .day
                 h3 Monday
                 - scheme.each do |ovning|
-                    .ovning
+                    .ovning.stand_shadow
                         -if ovning[3] == "mon"
                             = ovning[0] +" "+ ovning[1].to_s + "x" + ovning[2].to_s
                             form action="/delete_excercise" method="post"
@@ -99,7 +99,7 @@ nav
             .day
                 h3 Tuesday
                 - scheme.each do |ovning|
-                    .ovning
+                    .ovning.stand_shadow
                         -if ovning[3] == "tue"
                             = ovning[0] +" "+ ovning[1].to_s + "x" + ovning[2].to_s
                             form action="/delete_excercise" method="post"
@@ -108,7 +108,7 @@ nav
             .day
                 h3 Wednesday
                 - scheme.each do |ovning|
-                    .ovning
+                    .ovning.stand_shadow
                         -if ovning[3] == "wed"
                             = ovning[0] +" "+ ovning[1].to_s + "x" + ovning[2].to_s
                             form action="/delete_excercise" method="post"
@@ -135,7 +135,7 @@ nav
             .day
                 h3 Saturday
                 - scheme.each do |ovning|
-                    .ovning
+                    .ovning.stand_shadow
                         -if ovning[3] == "sat"
                             = ovning[0] +" "+ ovning[1].to_s + "x" + ovning[2].to_s
                             form action="/delete_excercise" method="post"
@@ -144,7 +144,7 @@ nav
             .day
                 h3 Sunday
                 - scheme.each do |ovning|
-                    .ovning
+                    .ovning.stand_shadow
                         -if ovning[3] == "sun"
                             = ovning[0] +" "+ ovning[1].to_s + "x" + ovning[2].to_s
                             form action="/delete_excercise" method="post"

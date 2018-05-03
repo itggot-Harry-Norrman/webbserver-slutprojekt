@@ -9,10 +9,10 @@ nav
                 input type="text" placeholder="Search Users" name="search_inp" class="search_inp stand_shadow"
                 input type="submit" value="Search" class="nav_submit stand_shadow"
         .logout    
-                form action="/logout" method="POST"
+            form.media_size action="/logout" method="POST"
                 input type="submit" value="Logout" class="nav_submit stand_shadow"
                 a href='/user/info' 
-                    .user_inf.stand_shadow
+                    .user_inf.stand_shadow.name
                             h3 style="color:black" #{user_info[0][0]}
                             .circle
                                 img.account_size src="../img/account_circle.png" alt=""/
