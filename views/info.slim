@@ -104,7 +104,7 @@ nav
                             = ovning[0] +" "+ ovning[1].to_s + "x" + ovning[2].to_s
                             form action="/delete_excercise" method="post"
                                 input type="hidden" name="excercise_id" value="#{ovning[4]}"
-                                input type="submit" value="x"
+                                input.remove type="submit" value="+"
             .day
                 h3 Wednesday
                 - scheme.each do |ovning|
@@ -113,7 +113,7 @@ nav
                             = ovning[0] +" "+ ovning[1].to_s + "x" + ovning[2].to_s
                             form action="/delete_excercise" method="post"
                                 input type="hidden" name="excercise_id" value="#{ovning[4]}"
-                                input type="submit" value="x"           
+                                input.remove type="submit" value="+"           
             .day
                 h3 Thursday
                 - scheme.each do |ovning|
@@ -122,7 +122,7 @@ nav
                             = ovning[0] +" "+ ovning[1].to_s + "x" + ovning[2].to_s
                             form action="/delete_excercise" method="post"
                                 input type="hidden" name="excercise_id" value="#{ovning[4]}"
-                                input type="submit" value="x"            
+                                input.remove type="submit" value="+"            
             .day
                 h3 Friday
                 - scheme.each do |ovning|
@@ -131,7 +131,7 @@ nav
                             = ovning[0] +" "+ ovning[1].to_s + "x" + ovning[2].to_s
                             form action="/delete_excercise" method="post"
                                 input type="hidden" name="excercise_id" value="#{ovning[4]}"
-                                input type="submit" value="x"            
+                                input.remove type="submit" value="+"            
             .day
                 h3 Saturday
                 - scheme.each do |ovning|
@@ -140,7 +140,7 @@ nav
                             = ovning[0] +" "+ ovning[1].to_s + "x" + ovning[2].to_s
                             form action="/delete_excercise" method="post"
                                 input type="hidden" name="excercise_id" value="#{ovning[4]}"
-                                input type="submit" value="x"            
+                                input.remove type="submit" value="+"            
             .day
                 h3 Sunday
                 - scheme.each do |ovning|
@@ -149,5 +149,5 @@ nav
                             = ovning[0] +" "+ ovning[1].to_s + "x" + ovning[2].to_s
                             form action="/delete_excercise" method="post"
                                 input type="hidden" name="excercise_id" value="#{ovning[4]}"
-                                input type="submit" value="x"            
+                                input.remove type="submit" value="+"            
 script src="../js/jquery-3.2.1.min.js"
