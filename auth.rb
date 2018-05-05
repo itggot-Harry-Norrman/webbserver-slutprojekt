@@ -33,9 +33,11 @@ module Auth
 			return 3
 		elsif username.size > 14
 			return 4
+		elsif username[/[a-zA-Z0-9]+/]  != username
+			return 5
 		else
 			db.execute("INSERT INTO users ('name', 'password', 'show_stat') VALUES (?,?,?)", [username, password_crypt, 0])
-			return 5
+			return 6
 		end
 		redirect('/')
 	end

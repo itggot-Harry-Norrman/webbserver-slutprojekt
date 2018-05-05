@@ -21,10 +21,7 @@ class App < Sinatra::Base
 	post '/register' do 
 		result = Auth::register(params[:username], params[:password], params[:password2])
 		result += -1 
-		if result != 5 
-			session[:msg] = ["Please enter a username and password.","Passwords don't match","Username already exists","Username is too long maximum length of username is 14 characters"][result]
-		else
-		end
+		session[:msg] = ["Please enter a username and password.","Passwords don't match","Username already exists","Username is too long maximum length of username is 14 characters", "Your name contains special characters, only letters and numbers are allowed", "You are now registered"][result]
 		# if result == 1
 		# 	session[:msg] = "Please enter a username and password."
 		# elsif result == 2
@@ -73,7 +70,11 @@ class App < Sinatra::Base
 	end
 
 	post '/search/user' do
-		redirect('/search/'+params['search_inp'])
+		if params[:search_inp][/[a-zA-Z0-9]+/] == params[:search_inp]
+			redirect('/search/'+params[:search_inp])
+		else
+			redirect('/user')
+		end
 	end
 
 	get '/search/:search_inp' do
